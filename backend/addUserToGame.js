@@ -7,6 +7,7 @@ const app = e();
 
 const addUserToGameRouter = e.Router();
 const removeUserFromGameRouter = e.Router();
+const showLeaderBoardRouter = e.Router();
 
 addUserToGameRouter.post("/", async function (req, res) {
   console.log("1");
@@ -152,6 +153,57 @@ removeUserFromGameRouter.post("/", async function (req, res) {
   });
 });
 
-showLeaderBoard.post("/", async function (req, res) {});
+showLeaderBoardRouter.post("/", async function (req, res) {
+  const gameName = req.body.gameName;
+  const username = req.body.username;
+  const password = req.body.password;
 
-export { addUserToGameRouter, removeUserFromGameRouter };
+  const corusername = z.string().email().safeParse(username);
+  const corpassword = z.string().safeParse(password);
+  const corgameName = z.string().safeParse(gameName);
+
+  console.log("2");
+
+  if (!(corgameName || corusername || corpassword)) {
+    return res.json({
+      msg: "Invalid details",
+    });
+  }
+
+  console.log("3");
+
+  const findGame = await Game.findOne({
+    gameName,
+  });
+
+  console.log("4");
+
+  if (!findGame) {
+    return res.json({
+      msg: "Game not created",
+    });
+  }
+
+  const findUser = await User.findOne({
+    username,
+    password,
+  });
+
+  console.log("4");
+
+  if (!findUser) {
+    return res.json({
+      msg: "User not signedin",
+    });
+  }
+
+  const arr = findGame.scores;
+
+  return res.json({
+    msg: "Reached till here",
+    arr
+  })
+  
+});
+
+export { addUserToGameRouter, removeUserFromGameRouter , showLeaderBoardRouter};

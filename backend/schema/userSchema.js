@@ -9,6 +9,10 @@ const userSchema = new Schema({
     password: {
         type: String,
         require: true
+    },
+    playerName: {
+        type: String,
+        require: true
     }
 })
 

@@ -42,6 +42,9 @@ submitScoreRouter.post("/", async function (req, res) {
     msg: "User has not games to the playlist"
   })
 
+
+
+
   const foundGame = await Game.findOne({
     gameName
   })
@@ -51,14 +54,21 @@ submitScoreRouter.post("/", async function (req, res) {
     msg: "Game is not present"
   })
 
+  const foundUserInGame = foundGame.players.indexOf(foundUser._id);
+
+  if(foundUserInGame < 0) return res.json({
+    msg: "User has not subscribed to the Games"
+  })
+
+
   console.log("6");
 
-  console.log(foundUser._id);
+  console.log(foundUser);
 
   try {
-    const sent1 = await client.zAdd("racer_scores", {
-      score: Number(scores),
-      value: foundUser.username.toString(),
+    const sent1 = await client.zAdd(gameName, {
+      score: scores,
+      value: foundUser.playerName
     });
   } catch (error) {
     console.log(error);
@@ -66,7 +76,7 @@ submitScoreRouter.post("/", async function (req, res) {
 
   console.log("7");
 
-  const sortIt = await client.zRangeWithScores("racer_scores", 0, -1);
+  const sortIt = await client.zRangeWithScores(gameName, 0, -1);
 
   if(foundGame.scores != null){
     foundGame.scores.pop();
