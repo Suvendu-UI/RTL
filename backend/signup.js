@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import JWT_SECRET from "./secret/config.js";
 import submitScoreRouter from "./submitScores.js";
 import addGameRouter from "./schema/addGame.js";
-import addUserToGameRouter from "./addUserToGame.js";
+import {addUserToGameRouter , removeUserFromGameRouter } from "./addUserToGame.js";
 
 const app = e();
 
@@ -29,6 +29,18 @@ signupRouter.post("/", async function (req, res, next) {
   }
 
   try {
+
+    const foundUser = await User.findOne({
+      username,
+      password,
+      playername
+  })
+
+  if(foundUser) return res.json({
+    msg: "User has already signed in"
+  })
+
+
     const objectMade = await User.create({
       username,
       password,
@@ -63,6 +75,6 @@ signupRouter.post("/", async function (req, res, next) {
 signupRouter.use('/submitScores', submitScoreRouter);
 signupRouter.use('/addGame', addGameRouter);
 signupRouter.use('/addUserToGame', addUserToGameRouter);
-signupRouter.use('/submitScores', submitScoreRouter);
+signupRouter.use('/removeUserFromGame', removeUserFromGameRouter );
 
 export { signupRouter };

@@ -1,5 +1,5 @@
 import express from "express";
-import zod from "zod";
+import z from "zod";
 import { createClient } from "redis";
 import User from "./schema/userSchema.js";
 import Game from "./schema/gameSchema.js";
@@ -21,7 +21,7 @@ submitScoreRouter.post("/", async function (req, res) {
   const corusername = z.string().email().safeParse(username);
   const corpassword = z.string().safeParse(password);
   const corgameName = z.string().safeParse(gameName);
-  const corscores = zod.number().safeParse(scores);
+  const corscores = z.number().safeParse(scores);
 
   console.log("4");
 
@@ -38,8 +38,17 @@ submitScoreRouter.post("/", async function (req, res) {
     password,
   });
 
+  if(!foundUser) return res.json({
+    msg: "User has not games to the playlist"
+  })
+
   const foundGame = await Game.findOne({
     gameName
+  })
+
+
+  if(!foundGame) return res.json({
+    msg: "Game is not present"
   })
 
   console.log("6");
